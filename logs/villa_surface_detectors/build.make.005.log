@@ -1,0 +1,10 @@
+[35m[1mScanning dependencies of target horizontal_plane_detector_server[0m
+[ 33%] [32mBuilding CXX object CMakeFiles/horizontal_plane_detector_server.dir/src/horizontal_plane_detector_server.cpp.o[0m
+[01m[K/home/thomas/villa_perception_2018/src/villa_surface_detectors/src/horizontal_plane_detector_server.cpp:39:60:[m[K [01;31m[Kfatal error: [m[Kvilla_surface_detectors/DetectHorizontalPlanes.h: No such file or directory
+compilation terminated.
+CMakeFiles/horizontal_plane_detector_server.dir/build.make:62: recipe for target 'CMakeFiles/horizontal_plane_detector_server.dir/src/horizontal_plane_detector_server.cpp.o' failed
+make[2]: *** [CMakeFiles/horizontal_plane_detector_server.dir/src/horizontal_plane_detector_server.cpp.o] Error 1
+CMakeFiles/Makefile2:67: recipe for target 'CMakeFiles/horizontal_plane_detector_server.dir/all' failed
+make[1]: *** [CMakeFiles/horizontal_plane_detector_server.dir/all] Error 2
+Makefile:138: recipe for target 'all' failed
+make: *** [all] Error 2

@@ -1,0 +1,1 @@
+/home/thomas/villa_perception_2018/devel/.private/villa_surface_detectors/share/villa_surface_detectors/cmake/villa_surface_detectors-msg-extras.cmake

@@ -1,0 +1,12 @@
+[31m[1mCMake Error[0m at /home/thomas/villa_perception_2018/src/villa_surface_detectors/CMakeLists.txt:215 (add_executable):
+  Cannot find source file:
+
+    src/horizontal_plane_detector_tester.cpp
+
+  Tried extensions .c .C .c++ .cc .cpp .cxx .m .M .mm .h .hh .h++ .hm .hpp
+  .hxx .in .txx
+
+
+CMake Error: CMake can not determine linker language for target: horizontal_plane_detector_tester
+CMake Error: Cannot determine link language for target "horizontal_plane_detector_tester".
+make: *** [cmake_check_build_system] Error 1

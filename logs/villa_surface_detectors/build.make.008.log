@@ -1,0 +1,32 @@
+[  0%] Built target sensor_msgs_generate_messages_nodejs
+[  0%] Built target std_msgs_generate_messages_cpp
+[  0%] Built target geometry_msgs_generate_messages_cpp
+[  0%] Built target visualization_msgs_generate_messages_cpp
+[  0%] Built target std_msgs_generate_messages_nodejs
+[  0%] Built target sensor_msgs_generate_messages_cpp
+[  0%] Built target visualization_msgs_generate_messages_nodejs
+[  0%] Built target geometry_msgs_generate_messages_nodejs
+[  0%] Built target std_msgs_generate_messages_py
+[  0%] Built target geometry_msgs_generate_messages_py
+[  0%] Built target std_msgs_generate_messages_eus
+[  0%] Built target sensor_msgs_generate_messages_py
+[  0%] Built target visualization_msgs_generate_messages_py
+[  0%] Built target sensor_msgs_generate_messages_eus
+[  0%] Built target _villa_surface_detectors_generate_messages_check_deps_DetectHorizontalPlanes
+[  0%] Built target visualization_msgs_generate_messages_eus
+[  0%] Built target visualization_msgs_generate_messages_lisp
+[  0%] Built target geometry_msgs_generate_messages_eus
+[  0%] Built target std_msgs_generate_messages_lisp
+[  0%] Built target sensor_msgs_generate_messages_lisp
+[  0%] Built target geometry_msgs_generate_messages_lisp
+[ 16%] Built target villa_surface_detectors_generate_messages_cpp
+[ 25%] Built target villa_surface_detectors_generate_messages_py
+[ 33%] Built target villa_surface_detectors_generate_messages_nodejs
+[ 50%] Built target villa_surface_detectors_generate_messages_eus
+[ 58%] Built target villa_surface_detectors_generate_messages_lisp
+[35m[1mScanning dependencies of target horizontal_plane_detector_tester[0m
+[ 58%] Built target villa_surface_detectors_generate_messages
+[ 83%] Built target horizontal_plane_detector_server
+[ 91%] [32mBuilding CXX object CMakeFiles/horizontal_plane_detector_tester.dir/src/horizontal_plane_detector_tester.cpp.o[0m
+[100%] [32m[1mLinking CXX executable /home/thomas/villa_perception_2018/devel/.private/villa_surface_detectors/lib/villa_surface_detectors/horizontal_plane_detector_tester[0m
+[100%] Built target horizontal_plane_detector_tester

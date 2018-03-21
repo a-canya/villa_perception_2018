@@ -1,0 +1,21 @@
+[01m[K/home/thomas/villa_perception_2018/src/villa_surface_detectors/src/horizontal_plane_detector_server.cpp:272:29:[m[K [01;31m[Kerror: [m[K‘[01m[Kvilla_surface_detectors[m[K’ has not been declared
+ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Request &req, villa_surface_detectors::DetectHorizontalPlanes::Response &res){
+[01;32m[K                             ^[m[K
+[01m[K/home/thomas/villa_perception_2018/src/villa_surface_detectors/src/horizontal_plane_detector_server.cpp:272:87:[m[K [01;31m[Kerror: [m[K‘[01m[Kreq[m[K’ was not declared in this scope
+ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Request &req, villa_surface_detectors::DetectHorizontalPlanes::Response &res){
+[01;32m[K                                                                                       ^[m[K
+[01m[K/home/thomas/villa_perception_2018/src/villa_surface_detectors/src/horizontal_plane_detector_server.cpp:272:92:[m[K [01;31m[Kerror: [m[K‘[01m[Kvilla_surface_detectors[m[K’ has not been declared
+ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Request &req, villa_surface_detectors::DetectHorizontalPlanes::Response &res){
+[01;32m[K                                                                                            ^[m[K
+[01m[K/home/thomas/villa_perception_2018/src/villa_surface_detectors/src/horizontal_plane_detector_server.cpp:272:151:[m[K [01;31m[Kerror: [m[K‘[01m[Kres[m[K’ was not declared in this scope
+ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Request &req, villa_surface_detectors::DetectHorizontalPlanes::Response &res){
+[01;32m[K                                                                                                                                                       ^[m[K
+[01m[K/home/thomas/villa_perception_2018/src/villa_surface_detectors/src/horizontal_plane_detector_server.cpp:272:154:[m[K [01;31m[Kerror: [m[Kexpression list treated as compound expression in initializer [-fpermissive]
+ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Request &req, villa_surface_detectors::DetectHorizontalPlanes::Response &res){
+[01;32m[K                                                                                                                                                          ^[m[K
+[01m[K/home/thomas/villa_perception_2018/src/villa_surface_detectors/src/horizontal_plane_detector_server.cpp:272:155:[m[K [01;31m[Kerror: [m[Kexpected ‘[01m[K,[m[K’ or ‘[01m[K;[m[K’ before ‘[01m[K{[m[K’ token
+ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Request &req, villa_surface_detectors::DetectHorizontalPlanes::Response &res){
+[01;32m[K                                                                                                                                                           ^[m[K
+make[2]: *** [CMakeFiles/horizontal_plane_detector_server.dir/src/horizontal_plane_detector_server.cpp.o] Error 1
+make[1]: *** [CMakeFiles/horizontal_plane_detector_server.dir/all] Error 2
+make: *** [all] Error 2

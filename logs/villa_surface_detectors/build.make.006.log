@@ -1,0 +1,66 @@
+[35m[1mScanning dependencies of target std_msgs_generate_messages_py[0m
+[35m[1mScanning dependencies of target visualization_msgs_generate_messages_py[0m
+[35m[1mScanning dependencies of target _villa_surface_detectors_generate_messages_check_deps_DetectHorizontalPlanes[0m
+[35m[1mScanning dependencies of target geometry_msgs_generate_messages_nodejs[0m
+[35m[1mScanning dependencies of target std_msgs_generate_messages_nodejs[0m
+[35m[1mScanning dependencies of target sensor_msgs_generate_messages_nodejs[0m
+[35m[1mScanning dependencies of target visualization_msgs_generate_messages_nodejs[0m
+[35m[1mScanning dependencies of target geometry_msgs_generate_messages_py[0m
+[  0%] Built target geometry_msgs_generate_messages_py
+[  0%] Built target visualization_msgs_generate_messages_nodejs
+[  0%] Built target std_msgs_generate_messages_nodejs
+[  0%] Built target geometry_msgs_generate_messages_nodejs
+[  0%] Built target std_msgs_generate_messages_py
+[  0%] Built target visualization_msgs_generate_messages_py
+[  0%] Built target sensor_msgs_generate_messages_nodejs
+[35m[1mScanning dependencies of target sensor_msgs_generate_messages_py[0m
+[35m[1mScanning dependencies of target std_msgs_generate_messages_eus[0m
+[35m[1mScanning dependencies of target visualization_msgs_generate_messages_eus[0m
+[35m[1mScanning dependencies of target geometry_msgs_generate_messages_eus[0m
+[35m[1mScanning dependencies of target sensor_msgs_generate_messages_eus[0m
+[35m[1mScanning dependencies of target visualization_msgs_generate_messages_lisp[0m
+[35m[1mScanning dependencies of target std_msgs_generate_messages_lisp[0m
+[  0%] Built target sensor_msgs_generate_messages_py
+[  0%] Built target std_msgs_generate_messages_eus
+[  0%] Built target visualization_msgs_generate_messages_eus
+[  0%] Built target geometry_msgs_generate_messages_eus
+[  0%] Built target sensor_msgs_generate_messages_eus
+[  0%] Built target visualization_msgs_generate_messages_lisp
+[  0%] Built target std_msgs_generate_messages_lisp
+[35m[1mScanning dependencies of target geometry_msgs_generate_messages_lisp[0m
+[35m[1mScanning dependencies of target sensor_msgs_generate_messages_lisp[0m
+[35m[1mScanning dependencies of target visualization_msgs_generate_messages_cpp[0m
+[35m[1mScanning dependencies of target std_msgs_generate_messages_cpp[0m
+[35m[1mScanning dependencies of target geometry_msgs_generate_messages_cpp[0m
+[35m[1mScanning dependencies of target sensor_msgs_generate_messages_cpp[0m
+[  0%] Built target sensor_msgs_generate_messages_lisp
+[  0%] Built target geometry_msgs_generate_messages_lisp
+[  0%] Built target geometry_msgs_generate_messages_cpp
+[  0%] Built target sensor_msgs_generate_messages_cpp
+[  0%] Built target visualization_msgs_generate_messages_cpp
+[  0%] Built target std_msgs_generate_messages_cpp
+[  0%] Built target _villa_surface_detectors_generate_messages_check_deps_DetectHorizontalPlanes
+[35m[1mScanning dependencies of target villa_surface_detectors_generate_messages_eus[0m
+[35m[1mScanning dependencies of target villa_surface_detectors_generate_messages_cpp[0m
+[35m[1mScanning dependencies of target villa_surface_detectors_generate_messages_py[0m
+[35m[1mScanning dependencies of target villa_surface_detectors_generate_messages_nodejs[0m
+[35m[1mScanning dependencies of target villa_surface_detectors_generate_messages_lisp[0m
+[ 10%] [34m[1mGenerating EusLisp code from villa_surface_detectors/DetectHorizontalPlanes.srv[0m
+[ 20%] [34m[1mGenerating C++ code from villa_surface_detectors/DetectHorizontalPlanes.srv[0m
+[ 40%] [34m[1mGenerating EusLisp manifest code for villa_surface_detectors[0m
+[ 40%] [34m[1mGenerating Python code from SRV villa_surface_detectors/DetectHorizontalPlanes[0m
+[ 50%] [34m[1mGenerating Lisp code from villa_surface_detectors/DetectHorizontalPlanes.srv[0m
+[ 60%] [34m[1mGenerating Javascript code from villa_surface_detectors/DetectHorizontalPlanes.srv[0m
+[ 60%] Built target villa_surface_detectors_generate_messages_lisp
+[ 60%] Built target villa_surface_detectors_generate_messages_nodejs
+[ 70%] [34m[1mGenerating Python srv __init__.py for villa_surface_detectors[0m
+[ 70%] Built target villa_surface_detectors_generate_messages_py
+[ 70%] Built target villa_surface_detectors_generate_messages_cpp
+[35m[1mScanning dependencies of target horizontal_plane_detector_server[0m
+[ 80%] [32mBuilding CXX object CMakeFiles/horizontal_plane_detector_server.dir/src/horizontal_plane_detector_server.cpp.o[0m
+[ 90%] [32mBuilding CXX object CMakeFiles/horizontal_plane_detector_server.dir/src/BoundingBox.cpp.o[0m
+[ 90%] Built target villa_surface_detectors_generate_messages_eus
+[35m[1mScanning dependencies of target villa_surface_detectors_generate_messages[0m
+[ 90%] Built target villa_surface_detectors_generate_messages
+[100%] [32m[1mLinking CXX executable /home/thomas/villa_perception_2018/devel/.private/villa_surface_detectors/lib/villa_surface_detectors/horizontal_plane_detector_server[0m
+[100%] Built target horizontal_plane_detector_server

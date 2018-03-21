@@ -1,0 +1,1 @@
+/home/thomas/villa_perception_2018/devel/.private/catkin_tools_prebuild/setup.zsh
