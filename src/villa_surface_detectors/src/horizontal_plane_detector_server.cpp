@@ -54,7 +54,7 @@
 #define MIN_NUMBER_PLANE_POINTS 500
 #define MIN_PLANE_DENSITY 30000
 #define STOPPING_PERCENTAGE 0.25 // Stop once we've processed all but X percentage of the cloud
-#define IGNORE_FLOOR false // If the input cloud doesn't already have z filtered, we can do it
+#define IGNORE_FLOOR true // If the input cloud doesn't already have z filtered, we can do it
 #define MIN_Z 0.05 // minimum z-value of point cloud in map frame to be considered
 #define MAX_Z 2.0 // maximum z-value of point cloud in map frame to be considered
 
@@ -171,12 +171,12 @@ BoundingBox extract_oriented_bounding_box_params(const PointCloudT::Ptr &plane_c
 }
 
 bool compare_cluster_size(const pcl::PointIndices &lhs, const pcl::PointIndices &rhs) {
-    return lhs.indices.size() < rhs.indices.size();
+    return lhs.indices.size() > rhs.indices.size();
 }
 
 /*Function for finding the largest plane from the segmented "table"
  * removes noise*/
-PointCloudT::Ptr seg_largest_plane(const PointCloudT::Ptr &in, double tolerance){
+std::vector<PointCloudT::Ptr> isolate_surfaces(const PointCloudT::Ptr &in, double tolerance){
     pcl::search::KdTree<PointT>::Ptr tree (new pcl::search::KdTree<PointT>);
     tree->setInputCloud (in);
     ROS_INFO("point cloud size of 'plane cloud' : %ld", in->size());
@@ -195,11 +195,18 @@ PointCloudT::Ptr seg_largest_plane(const PointCloudT::Ptr &in, double tolerance)
     if (cluster_indices.empty()) {
         throw std::exception();
     }
+		ROS_INFO("    Total number of surfaces from plane: %zu", cluster_indices.size());
 
-    pcl::PointIndices largest_cluster_indices = *std::max_element(cluster_indices.begin(), cluster_indices.end(), compare_cluster_size);
+    //pcl::PointIndices largest_cluster_indices = *std::max_element(cluster_indices.begin(), cluster_indices.end(), compare_cluster_size);
+		std::vector<PointCloudT::Ptr> surfaces;
 
-    PointCloudT::Ptr largest_cluster(new PointCloudT(*in, largest_cluster_indices.indices));
-    return largest_cluster;
+		//Optional
+		//std::sort(cluster_indices, compare_cluster_size);
+		for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin(); it < cluster_indices.end(); it++) {
+			PointCloudT::Ptr cluster(new PointCloudT(*in, (*it).indices));
+	    surfaces.push_back(cluster);
+		}
+		return surfaces;
 }
 
 void move_to_frame(const PointCloudT::Ptr &input, const string &target_frame, PointCloudT::Ptr &output) {
@@ -372,10 +379,12 @@ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Req
 	vector<visualization_msgs::Marker> horizontal_plane_AA_bounding_boxes_markers;
 	vector<pair<int, float> > indices_with_densities;
 	int num_planes = 0;
+	int ransac_iter = 0;
 	size_t num_start_points = cloud_filtered->points.size();
-	while (cloud_filtered->points.size() >  STOPPING_PERCENTAGE * num_start_points){
+
+	while (cloud_filtered->points.size() >  STOPPING_PERCENTAGE * num_start_points) {
 		// Segment the largest planar component from the remaining cloud
-		ROS_INFO("Extracting a horizontal plane...");
+		ROS_INFO("Extracting a horizontal plane %d", ransac_iter + 1);
 		seg.setInputCloud (cloud_filtered);
 		ROS_INFO("    Number of Points to Process: %zu", cloud_filtered->size());
 
@@ -409,21 +418,25 @@ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Req
 			pcl::toROSMsg(*cloud_plane, ros_cloud);
 			ros_cloud.header.frame_id = map_cloud->header.frame_id;
 			current_plane_cloud_pub.publish(ros_cloud);
+
+			ROS_INFO("Entire Plane Published");
+			if (DEBUG_ENTER) {
+				pressEnter("		Press Enter to begin showing surfaces");
+			}
 		}
 
 		// Perform clustering on this plane.
-		// use the largest cluster as the representative points of the plane.
+		std::vector<PointCloudT::Ptr> surfaces;
 
 		// if no clusters are found, this is an invalid plane extraction
 		try{
 			double cluster_extraction_tolerance = CLUSTER_TOL;
-			cloud_plane = seg_largest_plane(cloud_plane, cluster_extraction_tolerance);
-			ROS_INFO("    Extracted Plane Cloud Size: %zu", cloud_plane->size());
+			surfaces = isolate_surfaces(cloud_plane, cluster_extraction_tolerance);
 
-			if (cloud_plane->size() < MIN_NUMBER_PLANE_POINTS){
-				ROS_WARN("Plane contains insufficient points. Discarding");
-				continue;
-			}
+			// if (cloud_plane->size() < MIN_NUMBER_PLANE_POINTS){
+			// 	ROS_WARN("Plane contains insufficient points. Discarding");
+			// 	continue;
+			// }
 
 		}
 		catch(std::exception &e){
@@ -439,53 +452,62 @@ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Req
 		// 	current_plane_cloud_pub.publish(horizontal_plane_cloud_ros);
 		// }
 
-		//get the plane coefficients
-		Eigen::Vector4f plane_coefficients;
-		plane_coefficients(0) = coefficients->values[0];
-		plane_coefficients(1) = coefficients->values[1];
-		plane_coefficients(2) = coefficients->values[2];
-		plane_coefficients(3) = coefficients->values[3];
-		horizontal_plane_coefs.push_back(plane_coefficients);
+		for (std::vector<PointCloudT::Ptr>::const_iterator it = surfaces.begin(); it < surfaces.end(); it++) {
+			PointCloudT::Ptr current = *it;
 
-		// Extract the bonding box parameters of this plane
+			//get the plane coefficients
+			Eigen::Vector4f plane_coefficients;
+			plane_coefficients(0) = coefficients->values[0];
+			plane_coefficients(1) = coefficients->values[1];
+			plane_coefficients(2) = coefficients->values[2];
+			plane_coefficients(3) = coefficients->values[3];
+			horizontal_plane_coefs.push_back(plane_coefficients);
 
-        const BoundingBox &oriented_bbox_params = extract_oriented_bounding_box_params(cloud_plane);
+			// Extract the bonding box parameters of this plane
 
-		// Use the oriented bounding box for a better estimate of density. Non oriented box
-		// penalizes shelves that don't happen to be perfectly aligned with the map frame
-	 	double plane_bounding_box_density = calculate_density(cloud_plane,oriented_bbox_params);
+	    const BoundingBox &oriented_bbox_params = extract_oriented_bounding_box_params(current);
+
+			// Use the oriented bounding box for a better estimate of density. Non oriented box
+			// penalizes shelves that don't happen to be perfectly aligned with the map frame
+		 	double plane_bounding_box_density = calculate_density(current,oriented_bbox_params);
 
 
-	 	// Create Marker to represent bounding box
-	 	visualization_msgs::Marker plane_bounding_box_marker;
-	 	plane_bounding_box_marker = createBoundingBoxMarker(oriented_bbox_params, 0);
-		horizontal_plane_bounding_boxes_markers.push_back(plane_bounding_box_marker);
+		 	// Create Marker to represent bounding box
+		 	visualization_msgs::Marker plane_bounding_box_marker;
+		 	plane_bounding_box_marker = createBoundingBoxMarker(oriented_bbox_params, 0);
+			horizontal_plane_bounding_boxes_markers.push_back(plane_bounding_box_marker);
 
-	 	//store each "horizontal_plane" found
-		sensor_msgs::PointCloud2 horizontal_plane_cloud_ros;
-		pcl::toROSMsg(*cloud_plane, horizontal_plane_cloud_ros);
-		horizontal_plane_cloud_ros.header.frame_id = map_cloud->header.frame_id;
-		horizontal_planes.push_back(horizontal_plane_cloud_ros);
+		 	//store each "horizontal_plane" found
+			sensor_msgs::PointCloud2 horizontal_plane_cloud_ros;
+			pcl::toROSMsg(*current, horizontal_plane_cloud_ros);
+			horizontal_plane_cloud_ros.header.frame_id = map_cloud->header.frame_id;
+			horizontal_planes.push_back(horizontal_plane_cloud_ros);
 
-		const BoundingBox &aa_bbbox_params = extract_aa_bounding_box_params(cloud_plane);
-	 	visualization_msgs::Marker plane_AA_bounding_box_marker = createBoundingBoxMarker(aa_bbbox_params, num_planes);
-		horizontal_plane_AA_bounding_boxes_markers.push_back(plane_AA_bounding_box_marker);
+			const BoundingBox &aa_bbbox_params = extract_aa_bounding_box_params(current);
+		 	visualization_msgs::Marker plane_AA_bounding_box_marker = createBoundingBoxMarker(aa_bbbox_params, num_planes);
+			horizontal_plane_AA_bounding_boxes_markers.push_back(plane_AA_bounding_box_marker);
 
-		if (VISUALIZE) {
-			// Visualize plane bounding box marker
-			current_plane_cloud_pub.publish(horizontal_plane_cloud_ros);
-			horizontal_plane_marker_pub.publish(plane_bounding_box_marker);
+			if (VISUALIZE) {
+				// Visualize plane bounding box marker
+				current_plane_cloud_pub.publish(horizontal_plane_cloud_ros);
+				horizontal_plane_marker_pub.publish(plane_bounding_box_marker);
+			}
+
+			indices_with_densities.push_back(pair<int, float>(num_planes, (float) plane_bounding_box_density));
+			num_planes += 1;
+
+			if (DEBUG_ENTER){
+				ROS_INFO("%d planes total", num_planes);
+				pressEnter("    Press ENTER to show next surface in plane");
+			}
 		}
-
-		if (DEBUG_ENTER){
-			pressEnter("    Press ENTER to find next horizontal plane");
+		ransac_iter++;
+		if (DEBUG_ENTER) {
+			pressEnter("		Press Enter to show next entire plane");
 		}
-
-		indices_with_densities.push_back(pair<int, float>(num_planes, (float)plane_bounding_box_density));
-		num_planes += 1;
 	}
 
-    std::sort(indices_with_densities.begin(), indices_with_densities.end(), compare_by_second);
+  std::sort(indices_with_densities.begin(), indices_with_densities.end(), compare_by_second);
 
 	// Populate the response with planes sorted by density
 	for (vector< pair<int, float> >::const_iterator it = indices_with_densities.begin(); it < indices_with_densities.end(); ++it){
