@@ -1,0 +1,12 @@
+sensor_msgs/PointCloud2 cloud_input
+geometry_msgs/Point ignore_origin
+std_msgs/Float32 ignore_start_angle
+std_msgs/Float32 ignore_end_angle
+std_msgs/Float32 min_xy
+std_msgs/Float32 max_xy
+std_msgs/Float32 min_z
+std_msgs/Float32 max_z
+---
+sensor_msgs/PointCloud2[] table_clouds
+geometry_msgs/Quaternion[] table_plane_coefs
+visualization_msgs/Marker[] table_bounding_boxes
