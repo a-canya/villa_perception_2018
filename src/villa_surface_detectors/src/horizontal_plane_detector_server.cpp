@@ -461,10 +461,8 @@ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Req
 			plane_coefficients(1) = coefficients->values[1];
 			plane_coefficients(2) = coefficients->values[2];
 			plane_coefficients(3) = coefficients->values[3];
-			horizontal_plane_coefs.push_back(plane_coefficients);
 
 			// Extract the bonding box parameters of this plane
-
 	    const BoundingBox &oriented_bbox_params = extract_oriented_bounding_box_params(current);
 
 			// Use the oriented bounding box for a better estimate of density. Non oriented box
@@ -475,17 +473,14 @@ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Req
 		 	// Create Marker to represent bounding box
 		 	visualization_msgs::Marker plane_bounding_box_marker;
 		 	plane_bounding_box_marker = createBoundingBoxMarker(oriented_bbox_params, 0);
-			horizontal_plane_bounding_boxes_markers.push_back(plane_bounding_box_marker);
 
 		 	//store each "horizontal_plane" found
 			sensor_msgs::PointCloud2 horizontal_plane_cloud_ros;
 			pcl::toROSMsg(*current, horizontal_plane_cloud_ros);
 			horizontal_plane_cloud_ros.header.frame_id = map_cloud->header.frame_id;
-			horizontal_planes.push_back(horizontal_plane_cloud_ros);
 
 			const BoundingBox &aa_bbbox_params = extract_aa_bounding_box_params(current);
 		 	visualization_msgs::Marker plane_AA_bounding_box_marker = createBoundingBoxMarker(aa_bbbox_params, num_planes);
-			horizontal_plane_AA_bounding_boxes_markers.push_back(plane_AA_bounding_box_marker);
 
 			if (VISUALIZE) {
 				// Visualize plane bounding box marker
@@ -493,6 +488,19 @@ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Req
 				horizontal_plane_marker_pub.publish(plane_bounding_box_marker);
 			}
 
+			if (plane_bounding_box_density < MIN_PLANE_DENSITY){
+					ROS_INFO("Rejecting candidate plane with low density (%f)", plane_bounding_box_density);
+					if (DEBUG_ENTER){
+						ROS_INFO("%d planes total", num_planes);
+						pressEnter("    Press ENTER to show next surface in plane");
+					}
+					continue;
+			};
+
+			horizontal_plane_coefs.push_back(plane_coefficients);
+			horizontal_plane_bounding_boxes_markers.push_back(plane_bounding_box_marker);
+			horizontal_planes.push_back(horizontal_plane_cloud_ros);
+			horizontal_plane_AA_bounding_boxes_markers.push_back(plane_AA_bounding_box_marker);
 			indices_with_densities.push_back(pair<int, float>(num_planes, (float) plane_bounding_box_density));
 			num_planes += 1;
 
@@ -515,10 +523,6 @@ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Req
 		int i = pair.first;
 		float density = pair.second;
 
-        if (density < MIN_PLANE_DENSITY){
-            ROS_INFO("Rejecting candidate plane with low density (%f)", density);
-			continue;
-        };
 
 		res.horizontal_planes.push_back(horizontal_planes.at(i));
 		geometry_msgs::Quaternion coef;
