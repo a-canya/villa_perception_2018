@@ -214,7 +214,7 @@ void move_to_frame(const PointCloudT::Ptr &input, const string &target_frame, Po
         try{
             // Look up transform
             tf_listener->lookupTransform(target_frame, input->header.frame_id, ros::Time(0), stamped_transform);
-
+						ROS_INFO("Transfoming from (%s) to (%s)", input->header.frame_id.c_str(), target_frame.c_str());
             // Apply transform
             pcl_ros::transformPointCloud(*input, *output, stamped_transform);
 
@@ -344,7 +344,7 @@ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Req
 	seg.setMethodType (pcl::SAC_RANSAC);
 	seg.setMaxIterations (RANSAC_MAX_ITERATIONS);
 	seg.setDistanceThreshold (PLANE_DIST_TRESH);
-    seg.setEpsAngle(EPS_ANGLE);
+	seg.setEpsAngle(EPS_ANGLE);
 
 	//create the axis to use
 	ROS_INFO("Finding planes perpendicular to z-axis of %s frame",  z_axis_reference_frame.c_str());
@@ -355,7 +355,7 @@ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Req
 	ros_vec.vector.z = 1.0;
 
     geometry_msgs::Vector3Stamped out_vec;
-    vector_to_frame(ros_vec, req.cloud_input.header.frame_id, out_vec);
+    vector_to_frame(ros_vec, map_cloud->header.frame_id, out_vec);
 
 	//set the axis to the transformed vector
 	Eigen::Vector3f axis = Eigen::Vector3f(out_vec.vector.x, out_vec.vector.y , out_vec.vector.z);
@@ -402,12 +402,12 @@ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Req
 			//debugging publishing
 			sensor_msgs::PointCloud2 ros_remainder;
 			pcl::toROSMsg(*cloud_remainder, ros_remainder);
-			ros_remainder.header.frame_id = cloud_remainder->header.frame_id;
+			ros_remainder.header.frame_id = map_cloud->header.frame_id;
 			remaining_cloud_pub.publish(ros_remainder);
 
 			sensor_msgs::PointCloud2 ros_cloud;
 			pcl::toROSMsg(*cloud_plane, ros_cloud);
-			ros_cloud.header.frame_id = cloud_plane->header.frame_id;
+			ros_cloud.header.frame_id = map_cloud->header.frame_id;
 			current_plane_cloud_pub.publish(ros_cloud);
 		}
 
@@ -431,13 +431,14 @@ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Req
 			continue;
 		}
 
-		if (VISUALIZE) {
-			sensor_msgs::PointCloud2 horizontal_plane_cloud_ros;
-			pcl::toROSMsg(*cloud_plane, horizontal_plane_cloud_ros);
-			horizontal_plane_cloud_ros.header.frame_id = req.cloud_input.header.frame_id;
-			// Now that we've pulled out the largest cluster, lets visualize
-			current_plane_cloud_pub.publish(horizontal_plane_cloud_ros);
-		}
+		// if (VISUALIZE) {
+		// 	sensor_msgs::PointCloud2 horizontal_plane_cloud_ros;
+		// 	pcl::toROSMsg(*cloud_plane, horizontal_plane_cloud_ros);
+		// 	horizontal_plane_cloud_ros.header.frame_id = map_cloud->header.frame_id;
+		// 	// Now that we've pulled out the largest cluster, lets visualize
+		// 	current_plane_cloud_pub.publish(horizontal_plane_cloud_ros);
+		// }
+
 		//get the plane coefficients
 		Eigen::Vector4f plane_coefficients;
 		plane_coefficients(0) = coefficients->values[0];
@@ -463,7 +464,7 @@ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Req
 	 	//store each "horizontal_plane" found
 		sensor_msgs::PointCloud2 horizontal_plane_cloud_ros;
 		pcl::toROSMsg(*cloud_plane, horizontal_plane_cloud_ros);
-		horizontal_plane_cloud_ros.header.frame_id = req.cloud_input.header.frame_id;
+		horizontal_plane_cloud_ros.header.frame_id = map_cloud->header.frame_id;
 		horizontal_planes.push_back(horizontal_plane_cloud_ros);
 
 		const BoundingBox &aa_bbbox_params = extract_aa_bounding_box_params(cloud_plane);
