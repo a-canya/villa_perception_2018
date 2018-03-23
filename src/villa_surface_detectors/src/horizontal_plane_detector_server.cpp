@@ -1,4 +1,3 @@
-#include "../include/horizontal_plane_detector_server.h"
 #include <signal.h>
 #include <vector>
 #include <Eigen/Dense>
@@ -58,8 +57,8 @@
 #define MIN_Z 0.05 // minimum z-value of point cloud in map frame to be considered
 #define MAX_Z 2.0 // maximum z-value of point cloud in map frame to be considered
 
-#define VISUALIZE true
-#define DEBUG_ENTER true // if true, you have to press enter to continue the process
+#define VISUALIZE false
+#define DEBUG_ENTER false // if true, you have to press enter to continue the process
 
 /* define what kind of point clouds we're using */
 typedef pcl::PointXYZ PointT;
@@ -532,7 +531,7 @@ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Req
 		coef.z = current(2);
 		coef.w = current(3);
 
-		ROS_INFO("Plane %i ori: x:%f, y:%f, z:%f, w:%f, density: %f", i, coef.x, coef.y, coef.z, coef.w, density);
+		ROS_INFO("Plane %i ori: x:%f, y:%f, z:%f, w:%f, density: %f", i + 1, coef.x, coef.y, coef.z, coef.w, density);
 
 		res.horizontal_plane_coefs.push_back(coef);
 		res.horizontal_plane_bounding_boxes.push_back(horizontal_plane_bounding_boxes_markers.at(i));
@@ -549,7 +548,7 @@ int main (int argc, char** argv)
 	// Initialize ROS
 	ros::init (argc, argv, "horizontal_plane_detector_server");
 	ros::NodeHandle nh;
-    tf_listener = new tf::TransformListener(nh);
+  tf_listener = new tf::TransformListener(nh);
 
 	horizontal_plane_serv = nh.advertiseService("detect_horizontal_planes", find_horizontal_planes);
 

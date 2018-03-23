@@ -25,13 +25,13 @@ void pressEnter(std::string message){
 }
 
 
-void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input){	
+void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input){
 	// Store Cloud
 	cloud_in = (*input);
-	ROS_INFO("Pointcloud is ready.");	
+	ROS_INFO("Pointcloud is ready.");
 
 	// Prepare service request
-	villa_surface_detectors::DetectTable srv; 
+	villa_surface_detectors::DetectTable srv;
 	srv.request.cloud_input = cloud_in;
 
 	pressEnter("Press enter");
@@ -50,8 +50,8 @@ int main(int argc, char **argv) {
 	ros::init(argc, argv, "table_detector_tester_node");
 	ros::NodeHandle n;
 
-	std::string param_topic = "/hsrb/head_rgbd_sensor/depth_registered/rectified_points";	
-//	std::string param_topic = "/octomap_point_cloud_centers";	
+	std::string param_topic = "/hsrb/head_rgbd_sensor/depth_registered/rectified_points";
+//	std::string param_topic = "/octomap_point_cloud_centers";
 	ros::Subscriber sub = n.subscribe (param_topic, 10, cloud_cb);
 
 	table_detector_client = n.serviceClient<villa_surface_detectors::DetectTable>("detect_table");

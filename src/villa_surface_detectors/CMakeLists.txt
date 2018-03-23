@@ -65,6 +65,7 @@ add_service_files(
  FILES
  DetectHorizontalPlanes.srv
  DetectTable.srv
+ SegmentTableObjects.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -220,3 +221,11 @@ target_link_libraries(horizontal_plane_detector_tester ${catkin_LIBRARIES} ${PCL
 add_executable(table_detector_server src/table_detector_server.cpp)
 add_dependencies(table_detector_server villa_surface_detectors_generate_messages_cpp)
 target_link_libraries(table_detector_server ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+add_executable(table_detector_tester src/table_detector_tester.cpp)
+add_dependencies(table_detector_tester villa_surface_detectors_generate_messages_cpp)
+target_link_libraries(table_detector_tester ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+add_executable(table_object_segmentation_server src/table_object_segmentation_server.cpp)
+add_dependencies(table_object_segmentation_server villa_surface_detectors_generate_messages_cpp)
+target_link_libraries(table_object_segmentation_server ${catkin_LIBRARIES} ${PCL_LIBRARIES})

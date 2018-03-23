@@ -1,0 +1,7 @@
+sensor_msgs/PointCloud2 world_points
+sensor_msgs/PointCloud2 table_points
+geometry_msgs/Quaternion table_plane_coefs
+visualization_msgs/Marker table_bounding_box
+---
+sensor_msgs/PointCloud2[] objects
+visualization_msgs/Marker[] object_bounding_boxes

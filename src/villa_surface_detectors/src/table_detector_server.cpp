@@ -29,7 +29,7 @@ ros::ServiceServer table_detect_serv;
 ros::Publisher detected_table_marker_pub;
 ros::Publisher table_plane_points_pub;
 
-#define VISUALIZE false
+#define VISUALIZE true
 
 // This service returns the most likely location of a cupboard based on number of overlapping bounding boxes of planes in the x-y plane
 typedef pcl::PointXYZ PointT;
