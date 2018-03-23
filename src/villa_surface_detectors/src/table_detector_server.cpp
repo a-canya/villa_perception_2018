@@ -14,7 +14,7 @@
 #include "villa_surface_detectors/DetectTable.h"
 
 #include <tf/transform_listener.h>
-#include "pcl_angle_filter.h"
+#include "../include/pcl_angle_filter.h"
 
 #define TABLE_MARKER_NAMESPACE "table_marker"
 

@@ -7,6 +7,6 @@ std_msgs/Float32 max_xy
 std_msgs/Float32 min_z
 std_msgs/Float32 max_z
 ---
-sensor_msgs/PointCloud2[] table_clouds
-geometry_msgs/Quaternion[] table_plane_coefs
-visualization_msgs/Marker[] table_bounding_boxes
+sensor_msgs/PointCloud2 table_points
+geometry_msgs/Quaternion table_plane_coefs
+visualization_msgs/Marker table_bounding_box
