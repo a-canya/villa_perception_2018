@@ -81,7 +81,6 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input){
 		ROS_ERROR("Failed to call service horizontal_plane_detector_server");
 		ROS_INFO("Attempting service call again when cloud becomes available");
 	}
-
 }
 
 int main(int argc, char **argv) {
@@ -90,7 +89,7 @@ int main(int argc, char **argv) {
 	ros::NodeHandle n;
 
 	horizontal_plane_detector_client = n.serviceClient<villa_surface_detectors::DetectHorizontalPlanes>("detect_horizontal_planes");
-	villa_surface_detectors::DetectHorizontalPlanes srv; 
+	villa_surface_detectors::DetectHorizontalPlanes srv;
 
 	std::string param_topic = "/hsrb/head_rgbd_sensor/depth_registered/rectified_points";
 	//std::string param_topic = "/octomap_point_cloud_centers";

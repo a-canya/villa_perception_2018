@@ -1,8 +1,10 @@
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 #include "villa_surface_detectors/DetectTable.h"
+#include "villa_surface_detectors/SegmentTableObjects.h"
 
 ros::ServiceClient table_detector_client;
+ros::ServiceClient table_segmentor_client;
 
 // Cloud for processing
 sensor_msgs::PointCloud2 cloud_in;
@@ -31,18 +33,29 @@ void cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input){
 	ROS_INFO("Pointcloud is ready.");
 
 	// Prepare service request
-	villa_surface_detectors::DetectTable srv;
-	srv.request.cloud_input = cloud_in;
+	villa_surface_detectors::DetectTable detect;
+	detect.request.cloud_input = cloud_in;
 
 	pressEnter("Press enter");
 	// Perform Service Call
-	if (table_detector_client.call(srv)){
-		ROS_INFO("Call was successful!\n");
+	if (table_detector_client.call(detect)){
+		ROS_INFO("Table detection call was successful!\n");
 	}else{
 		ROS_ERROR("Failed to call service table_detector_service");
 		ROS_INFO("Attempting service call again when cloud becomes available");
 	}
 
+	villa_surface_detectors::SegmentTableObjects segment;
+	segment.request.world_points = cloud_in;
+	segment.request.table_points = detect.response.table_points;
+	segment.request.table_plane_coefs = detect.response.table_plane_coefs;
+	segment.request.table_bounding_box = detect.response.table_bounding_box;
+	if (table_segmentor_client.call(segment)){
+		ROS_INFO("Table object segmentation call was successful!\n");
+	}else{
+		ROS_ERROR("Failed to call service table_detector_service");
+		ROS_INFO("Attempting service call again when cloud becomes available");
+	}
 }
 
 int main(int argc, char **argv) {
@@ -55,6 +68,7 @@ int main(int argc, char **argv) {
 	ros::Subscriber sub = n.subscribe (param_topic, 10, cloud_cb);
 
 	table_detector_client = n.serviceClient<villa_surface_detectors::DetectTable>("detect_table");
+	table_segmentor_client = n.serviceClient<villa_surface_detectors::SegmentTableObjects>("segment_objects");
 
 	ros::spin();
 

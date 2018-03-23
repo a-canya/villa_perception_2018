@@ -12,8 +12,15 @@
 #include <pcl/filters/crop_box.h>
 #include <pcl/filters/passthrough.h>
 #include <pcl/filters/voxel_grid.h>
+#include <pcl/filters/extract_indices.h>
 #include <pcl/common/time.h>
 #include <pcl/common/common.h>
+#include <pcl/sample_consensus/method_types.h>
+#include <pcl/sample_consensus/model_types.h>
+#include <pcl/sample_consensus/sac_model_plane.h>
+#include <pcl/segmentation/sac_segmentation.h>
+#include <pcl/segmentation/extract_clusters.h>
+#include <pcl/kdtree/kdtree.h>
 
 #include "villa_surface_detectors/SegmentTableObjects.h"
 #include "villa_surface_detectors/DetectTable.h"
@@ -34,10 +41,17 @@ tf::TransformListener *tf_listener;
 
 #define TARGET_FRAME "map" //target frame name DONT CHANGE!
 #define VOXEL_LEAF_SIZE 0.01 //size of voxel leaf for processing
+#define MIN_NUM_OBJECT_POINTS 10 //VERY TENTATIVE 10
+#define RANSAC_MAX_ITERATIONS 10000
+#define PLANE_DIST_TRESH 0.025 //maximum distance from plane
+#define MIN_NUMBER_PLANE_POINTS 500 //Lower??
+#define EPS_ANGLE 0.05 //epsilon angle for segmenting, value in radians
+#define CLUSTER_TOLERANCE 0.03 //Tentatively set at 3 cm for object cluster tolerance
+#define MAXIMUM_OBJECT_HEIGHT 0.30 //1 foot max height
 
 
-#define VISUALIZE true
-#define DEBUG_ENTER true // if true, you have to press enter to continue the process
+#define VISUALIZE false
+#define DEBUG_ENTER false // if true, you have to press enter to continue the process
 
 
 // This service returns the most likely location of a cupboard based on number of overlapping bounding boxes of planes in the x-y plane
@@ -140,10 +154,10 @@ bool segment_objects(villa_surface_detectors::SegmentTableObjects::Request &req,
   Eigen::Vector4f minPoint, maxPoint;
   maxPoint[0] = req.table_bounding_box.scale.x / 2;
   maxPoint[1] = req.table_bounding_box.scale.y / 2;
-  maxPoint[2] = req.table_bounding_box.scale.z / 2;
+  maxPoint[2] = (req.table_bounding_box.scale.z / 2) + MAXIMUM_OBJECT_HEIGHT;
   minPoint[0] = (-1) * maxPoint[0];
   minPoint[1] = (-1) * maxPoint[1];
-  minPoint[2] = (-1) * maxPoint[2];
+  minPoint[2] = ((-1) * maxPoint[2]) + MAXIMUM_OBJECT_HEIGHT;
 
   PointCloudT::Ptr table_cloud(new PointCloudT);
   pcl::CropBox<PointT> crop;
@@ -158,13 +172,77 @@ bool segment_objects(villa_surface_detectors::SegmentTableObjects::Request &req,
   if (DEBUG_ENTER) {
     if (VISUALIZE) {
       sensor_msgs::PointCloud2 ros_remainder;
-      pcl::toROSMsg(*map_cloud, ros_remainder);
+      pcl::toROSMsg(*table_cloud, ros_remainder);
       ros_remainder.header.frame_id = map_cloud->header.frame_id;
       table_remainder.publish(ros_remainder);
     }
-    pressEnter("    Press Enter to begin extracting objects...");
+    pressEnter("    Press Enter to remove plane...");
   }
 
+	// Create the segmentation object
+	pcl::SACSegmentation<PointT> seg;
+	pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients ());
+	pcl::PointIndices::Ptr inliers (new pcl::PointIndices ());
+	PointCloudT::Ptr objects_cloud(new PointCloudT);
+	seg.setOptimizeCoefficients (true);
+
+	//look for a plane perpendicular to a given axis
+	seg.setModelType (pcl::SACMODEL_PERPENDICULAR_PLANE);
+	seg.setMethodType (pcl::SAC_RANSAC);
+	seg.setMaxIterations (RANSAC_MAX_ITERATIONS);
+	seg.setDistanceThreshold (PLANE_DIST_TRESH);
+	seg.setEpsAngle(EPS_ANGLE);
+
+	Eigen::Vector3f axis = Eigen::Vector3f(0.0, 0.0, 1.0);
+	seg.setAxis(axis);
+
+	seg.setInputCloud (table_cloud);
+	seg.segment (*inliers, *coefficients);
+
+	pcl::ExtractIndices<PointT> extract;
+	extract.setInputCloud (table_cloud);
+	extract.setIndices (inliers);
+	extract.setNegative (true);
+	extract.filter (*objects_cloud);
+
+	if (DEBUG_ENTER) {
+	    if (VISUALIZE) {
+				ROS_INFO("All objects published to remainder cloud");
+	      sensor_msgs::PointCloud2 ros_remainder;
+	      pcl::toROSMsg(*objects_cloud, ros_remainder);
+	      ros_remainder.header.frame_id = map_cloud->header.frame_id;
+	      table_remainder.publish(ros_remainder);
+	    }
+	    pressEnter("    Press Enter to begin extracting objects...");
+	}
+
+	pcl::search::KdTree<PointT>::Ptr tree (new pcl::search::KdTree<PointT>);
+	tree->setInputCloud (objects_cloud);
+
+	vector<pcl::PointIndices> cluster_indices;
+	pcl::EuclideanClusterExtraction<PointT> ec;
+	ec.setClusterTolerance (CLUSTER_TOLERANCE);
+	ec.setMinClusterSize (MIN_NUM_OBJECT_POINTS);
+	ec.setSearchMethod (tree);
+	ec.setInputCloud (objects_cloud);
+	ec.extract (cluster_indices);
+
+	ROS_INFO("number of 'object clouds' : %ld", cluster_indices.size());
+
+	for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin(); it < cluster_indices.end(); it++) {
+		PointCloudT::Ptr cluster(new PointCloudT(*objects_cloud, (*it).indices));
+		sensor_msgs::PointCloud2 ros_object;
+		pcl::toROSMsg(*cluster, ros_object);
+		ros_object.header.frame_id = map_cloud->header.frame_id;
+		if (VISUALIZE) {
+			table_object_pub.publish(ros_object);
+		}
+		if (DEBUG_ENTER) {
+		    pressEnter("    Press Enter to extract next object");
+	  }
+		res.objects.push_back(ros_object);
+	}
+	ROS_INFO("Object segmentation finished: %zu objects of at least %d points found", res.objects.size(), MIN_NUM_OBJECT_POINTS);
   return true;
 }
 

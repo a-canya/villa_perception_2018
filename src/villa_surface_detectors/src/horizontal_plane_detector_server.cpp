@@ -538,6 +538,7 @@ bool find_horizontal_planes(villa_surface_detectors::DetectHorizontalPlanes::Req
 		res.horizontal_plane_AA_bounding_boxes.push_back(horizontal_plane_AA_bounding_boxes_markers.at(i));
 	}
 
+	ROS_INFO("Horizontal Plane Segmentation finished: %zu planes of at least %d density found", res.horizontal_planes.size(), MIN_PLANE_DENSITY);
 
 	return true;
 }
@@ -549,6 +550,7 @@ int main (int argc, char** argv)
 	ros::init (argc, argv, "horizontal_plane_detector_server");
 	ros::NodeHandle nh;
   tf_listener = new tf::TransformListener(nh);
+	ROS_INFO("table_object_segmentation_server started");
 
 	horizontal_plane_serv = nh.advertiseService("detect_horizontal_planes", find_horizontal_planes);
 
