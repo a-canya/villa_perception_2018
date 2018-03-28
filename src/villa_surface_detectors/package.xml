@@ -69,6 +69,7 @@
   <build_export_depend>visualzation_msgs</build_export_depend>
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>message_runtime</exec_depend>
+  <exec_depend>message_generation</exec_depend>
   <exec_depend>pcl_conversions</exec_depend>
   <exec_depend>pcl_ros</exec_depend>
   <exec_depend>roscpp</exec_depend>
@@ -77,6 +78,7 @@
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>visualzation_msgs</exec_depend>
   <exec_depend>libpcl-all</exec_depend>
+  <exec_depend>actionlib_msgs</exec_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

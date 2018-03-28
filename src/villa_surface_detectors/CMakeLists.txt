@@ -69,19 +69,19 @@ add_service_files(
 )
 
 ## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
+add_action_files(
+  DIRECTORY action
+  FILES PerceiveTabletopScene.action
+)
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
- DEPENDENCIES
- geometry_msgs
- sensor_msgs
- std_msgs
- visualization_msgs
+  DEPENDENCIES
+  geometry_msgs
+  sensor_msgs
+  std_msgs
+  visualization_msgs
+  actionlib_msgs
 )
 
 ################################################
@@ -116,7 +116,18 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES villa_surface_detectors
-#  CATKIN_DEPENDS geometry_msgs message_generation message_runtime pcl_conversions pcl_ros roscpp rospy sensor_msgs std_msgs visualzation_msgs
+  CATKIN_DEPENDS
+#  geometry_msgs
+#  message_generation
+#  message_runtime
+#  pcl_conversions
+#  pcl_ros
+#  roscpp
+#  rospy
+#  sensor_msgs
+#  std_msgs
+#  visualzation_msgs
+  actionlib_msgs
 #  DEPENDS system_lib
 )
 
@@ -229,3 +240,11 @@ target_link_libraries(table_detector_tester ${catkin_LIBRARIES} ${PCL_LIBRARIES}
 add_executable(table_object_segmentation_server src/table_object_segmentation_server.cpp)
 add_dependencies(table_object_segmentation_server villa_surface_detectors_generate_messages_cpp)
 target_link_libraries(table_object_segmentation_server ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+add_executable(perceive_tabletop_scene_action_server src/tabletop_perception_action_server.cpp)
+add_dependencies(perceive_tabletop_scene_action_server villa_surface_detectors_generate_messages_cpp)
+target_link_libraries(perceive_tabletop_scene_action_server ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+add_executable(tabletop_perception_action_tester src/tabletop_perception_action_tester)
+add_dependencies(tabletop_perception_action_tester villa_surface_detectors_generate_messages_cpp)
+target_link_libraries(tabletop_perception_action_tester ${catkin_LIBRARIES} ${PCL_LIBRARIES})
